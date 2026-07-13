@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestion Club Football V6.2 - Calendrier, Stats & Lieux</title>
+<style>
+:root { 
+    --primary: #1e3a8a; 
+    --secondary: #2563eb; 
+    --bg: #f8fafc; 
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --text-light: #64748b;
+    --danger: #ef4444; 
+    --success: #22c55e; 
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --border: #e2e8f0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 25px 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.header-container { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: center; gap: 20px; }
+.club-logo { height: 70px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); }
+.header-text { text-align: left; }
+header h1 { font-size: 2rem; margin-bottom: 5px; }
+header p { font-size: 1rem; opacity: 0.9; }
+
+.navbar { display: flex; gap: 8px; padding: 12px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow-x: auto; white-space: nowrap; }
+.nav-btn { padding: 10px 16px; border: 0; border-radius: 8px; cursor: pointer; background: #f1f5f9; color: var(--text-light); font-weight: 600; transition: all 0.2s ease; font-size: 14px; }
+.nav-btn:hover { background: #e2e8f0; color: var(--text); }
+.nav-btn.active { background: var(--primary); color: white; }
+.nav-btn.auth-status { margin-left: auto; background: #fee2e2; color: var(--danger); }
+.nav-btn.auth-status.logged { background: #dcfce7; color: #16a34a; }
+
+.hidden-nav { display: none !important; }
+
+.tab { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.tab.hidden { display: none; }
+.tab:not(.hidden) { animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+.card { background: var(--card-bg); padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+.card h2 { font-size: 1.15rem; color: var(--primary); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+.form-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input, select, textarea { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: #fff; outline: none; transition: border-color 0.2s; }
+input:focus, select:focus, textarea:focus { border-color: var(--secondary); }
+textarea { width: 100%; resize: vertical; }
+
+button { padding: 10px 16px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; }
+button:hover { opacity: 0.9; }
+button.save { background: var(--success); color: white; }
+button.action { background: var(--secondary); color: white; }
+button.delete { background: var(--danger); color: white; }
+button.secondary { background: #64748b; color: white; }
+
+.table-wrapper { overflow-x: auto; margin-top: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
+table { width: 100%; border-collapse: collapse; background: white; text-align: left; }
+th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
+th { background: #f1f5f9; color: var(--primary); font-weight: 600; white-space: nowrap; }
+tr:hover { background: #f8fafc; }
+
+select.presence-select { padding: 4px 8px; font-weight: bold; border-radius: 6px; border: 1px solid #cbd5e1; }
+select.presence-select[data-val="P"] { background: #dcfce7; color: #16a34a; }
+select.presence-select[data-val="A"] { background: #fee2e2; color: #dc2626; }
+select.presence-select[data-val="B"] { background: #fef3c7; color: #d97706; }
+select.presence-select[data-val="E"] { background: #dbeafe; color: #2563eb; }
+select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
+
+.profil-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+.profil-card { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.profil-title { color: var(--primary); font-weight: bold; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 8px; }
+.badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: bold; border-radius: 12px; background: #e2e2e2; color: var(--text); margin-right: 4px; margin-bottom: 4px;}
+.badge.poste { background: #dbeafe; color: var(--primary); }
+
+.profil-section-title { font-size: 12px; font-weight: bold; color: var(--primary); margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.mini-stats-wrapper { display: flex; gap: 5px; background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border); justify-content: space-around; margin-bottom: 8px; }
+.mini-stat-item { text-align: center; font-size: 11px; font-weight: bold; }
+.mini-stat-item span { display: block; font-size: 13px; margin-top: 1px; }
+.stat-P { color: #16a34a; }
+.stat-A { color: #dc2626; }
+.stat-B { color: #d97706; }
+.stat-E { color: #2563eb; }
+.stat-NC { color: #475569; }
+
+.search-box { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+.th-date-container { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; }
+.th-lieu { font-size: 10px; color: var(--text-light); font-weight: normal; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-del-seance { background: none; border: none; color: var(--danger); cursor: pointer; padding: 0; font-size: 11px; }
+
+.toggle-container { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer; user-select: none; }
+.toggle-container input { cursor: pointer; width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <img src="chemin/vers/votre-logo.png" alt="Logo Club" class="club-logo" onerror="this.style.display='none';">
+        <div class="header-text">
+            <h1>⚽ FC-Erde LA 1 - Saison 2026 / 2027</h1>
+        </div>
+    </div>
+</header>
+
+<div class="navbar">
+    <button class="nav-btn active" data-target="dashboard">🏠 Dashboard</button>
+    <button class="nav-btn" data-target="effectif">👥 Effectif</button>
+    <button class="nav-btn" data-target="entrainements">📅 Entraînements</button>
+    <button class="nav-btn" data-target="matchs">🏆 Matchs</button>
+    <button class="nav-btn" data-target="profils">👤 Profils</button>
+    <button class="nav-btn hidden-nav" id="btnNavFiche" data-target="fiche">📄 Fiche Joueur</button>
+    <button class="nav-btn" data-target="sauvegarde">💾 Sauvegarde</button>
+    <button class="nav-btn auth-status" id="btnNavAuth" data-target="loginTab">🔒 Modifications</button>
+</div>
+
+<div id="loginTab" class="tab hidden">
+    <div class="card" style="max-width: 400px; margin: 0 auto;">
+        <h2>🔐 Espace Administrator</h2>
+        <div id="loginForm">
+            <input type="password" id="adminPassword" placeholder="Mot de passe" style="width: 100%; margin-bottom: 15px;">
+            <button class="action" id="btnSubmitLogin" style="width: 100%;">Se connecter</button>
+        </div>
+        <div id="logoutForm" class="hidden">
+            <p style="margin-bottom: 15px; color: var(--success); font-weight: bold;">✔️ Connecté</p>
+            <button class="delete" id="btnSubmitLogout" style="width: 100%;">Se déconnecter</button>
+        </div>
+    </div>
+</div>
+
+<div id="dashboard" class="tab">
+    <div class="card">
+        <h2>📅 Suivi Présences (Entraînements)</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr id="dashboardHeadEntrainements"></tr></thead>
+                <tbody id="dashboardBodyEntrainements"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🏆 Suivi Convocations & Matchs</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr id="dashboardHeadMatchs"></tr></thead>
+                <tbody id="dashboardBodyMatchs"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="effectif" class="tab hidden">
+    <div class="card">
+        <h2>Ajouter un nouveau joueur</h2>
+        <div class="form-group">
+            <input type="number" id="numero" placeholder="N°" style="width: 70px;">
+            <input type="text" id="nom" placeholder="Nom">
+            <input type="text" id="prenom" placeholder="Prénom">
+            <select id="poste">
+                <option value="ND">ND</option>
+                <option value="Gardien">Gardien</option>
+                <option value="Défenseur">Défenseur</option>
+                <option value="Milieu">Milieu</option>
+                <option value="Attaquant">Attaquant</option>
+            </select>
+            <button class="save" id="btnAjouterJoueur">➕ Ajouter au groupe</button>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Liste des Licenciés</h2>
+        <div class="search-box">
+            <input type="text" id="searchJoueur" placeholder="🔍 Rechercher un nom..." style="flex: 1;">
+            <select id="filterPoste">
+                <option value="Tous">Tous les postes</option>
+                <option value="Gardien">Gardiens</option>
+                <option value="Défenseur">Défenseurs</option>
+                <option value="Milieu">Milieux</option>
+                <option value="Attaquant">Attaquants</option>
+            </select>
+            <button class="action" id="btnTrierNom">Trier par Nom ↕️</button>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 60px; text-align: center;">N°</th>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Poste</th>
+                        <th style="width: 150px; text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="effectifBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="entrainements" class="tab hidden">
+    <div class="card">
+        <h2>Créer une nouvelle séance d'entraînement</h2>
+        <div class="form-group">
+            <input type="date" id="nouvelleDateSeance">
+            <button class="save" id="btnAjouterSeance">📅 Ajouter la séance</button>
+            
+            <label class="toggle-container">
+                <input type="checkbox" id="checkboxAfficherPasses">
+                👁️ Afficher les entraînements passés
+            </label>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Suivi des présences par date (Entraînements)</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr id="headEntrainements"></tr></thead>
+                <tbody id="bodyEntrainements"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="matchs" class="tab hidden">
+    <div class="card">
+        <h2>Planifier un nouveau Match</h2>
+        <div class="form-group">
+            <label style="font-weight:600;">Date :</label>
+            <input type="date" id="nouvelleDateMatch">
+            <label style="font-weight:600;">Emplacement / Lieu :</label>
+            <input type="text" id="nouveauLieuMatch" placeholder="Ex: Stade Cantonal, Extérieur..." style="min-width: 250px;">
+            <button class="save" id="btnAjouterMatch">🏆 Ajouter le match</button>
+            
+            <label class="toggle-container">
+                <input type="checkbox" id="checkboxAfficherMatchsPasses">
+                👁️ Afficher les matchs passés
+            </label>
+        </div>
+    </div>
+    <div class="card">
+        <h2>Suivi des convocations et présences (Matchs)</h2>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr id="headMatchs"></tr></thead>
+                <tbody id="bodyMatchs"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="profils" class="tab hidden">
+    <div class="card">
+        <h2>Fiches et Bilan Individualisé des Présences</h2>
+        <div class="profil-grid" id="profilsContainer"></div>
+    </div>
+</div>
+
+<div id="fiche" class="tab hidden">
+    <div class="card">
+        <h2>Édition Complète de la Fiche Joueur</h2>
+        <input type="hidden" id="ficheId">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <p><label>Numéro :</label><input type="number" id="ficheNumero" style="width:100%;"></p>
+            <p><label>Poste :</label>
+                <select id="fichePoste" style="width:100%;">
+                    <option value="ND">ND</option>
+                    <option value="Gardien">Gardien</option>
+                    <option value="Défenseur">Défenseur</option>
+                    <option value="Milieu">Milieu</option>
+                    <option value="Attaquant">Attaquant</option>
+                </select>
+            </p>
+            <p><label>Nom :</label><input type="text" id="ficheNom" style="width:100%;"></p>
+            <p><label>Prénom :</label><input type="text" id="fichePrenom" style="width:100%;"></p>
+        </div>
+        <p><label>Notes & Commentaires :</label><textarea id="ficheNotes" rows="5"></textarea></p><br>
+        <button class="save" id="btnEnregistrerFiche">💾 Enregistrer et retourner à l'effectif</button>
+        <button class="secondary" id="btnAnnulerFiche">Annuler</button>
+    </div>
+</div>
+
+<div id="sauvegarde" class="tab hidden">
+    <div class="card">
+        <h2>Exportation & Importation</h2>
+        <button class="action" id="btnExport">📥 Télécharger la Sauvegarde (.json)</button>
+        <button class="action" id="btnTriggerImport">📤 Charger un fichier</button>
+        <input type="file" id="importFile" style="display: none;" accept=".json">
+    </div>
+</div>
+
+<script>
+let joueurs = [];
+let seancesDates = []; 
+let matchsDates = [];
+let triNomAsc = true;
+let IsLoggedIn = false;
+const SECRET_PASSWORD = "2627";
+
+const generateId = () => (typeof crypto.randomUUID === 'function') ? crypto.randomUUID() : '_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+
+function formatShortDate(dateStr) {
+    if(!dateStr) return "";
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}`;
+}
+
+function checkAuth() {
+    if (!IsLoggedIn) {
+        alert("🔒 Action refusée. Droits d'édition requis.");
+        document.getElementById("btnNavAuth").click();
+        return false;
+    }
+    return true;
+}
+
+function trierJoueursAlphabetique() {
+    joueurs.sort((a, b) => {
+        let nomA = (a.nom || "").trim().toLowerCase();
+        let nomB = (b.nom || "").trim().toLowerCase();
+        return triNomAsc ? nomA.localeCompare(nomB) : nomB.localeCompare(nomA);
+    });
+}
+
+try { 
+    let localData = localStorage.getItem("joueurs_v5");
+    let localDates = localStorage.getItem("seances_v5");
+    let localMatchs = localStorage.getItem("matchs_v5");
+    if(localData) joueurs = JSON.parse(localData);
+    if(localDates) seancesDates = JSON.parse(localDates);
+    if(localMatchs) matchsDates = JSON.parse(localMatchs);
+} catch(e) { joueurs = []; seancesDates = []; matchsDates = []; }
+
+if(!Array.isArray(joueurs)) joueurs = [];
+if(!Array.isArray(seancesDates)) seancesDates = [];
+if(!Array.isArray(matchsDates)) matchsDates = [];
+
+matchsDates = matchsDates.map(m => typeof m === 'string' ? { date: m, lieu: "Non spécifié" } : m);
+
+if(seancesDates.length === 0) seancesDates = ["2026-08-04", "2026-08-11"];
+if(matchsDates.length === 0) matchsDates = [{date: "2026-08-09", lieu: "Domicile"}, {date: "2026-08-23", lieu: "Stade Cantonal"}];
+
+joueurs.forEach(j => { 
+    if(!j.id) j.id = generateId();
+    if(!j.presencesDates || typeof j.presencesDates !== 'object') j.presencesDates = {};
+    if(!j.presencesMatchs || typeof j.presencesMatchs !== 'object') j.presencesMatchs = {};
+    seancesDates.forEach(date => { if(!j.presencesDates[date]) j.presencesDates[date] = "P"; });
+    matchsDates.forEach(m => { if(!j.presencesMatchs[m.date]) j.presencesMatchs[m.date] = "P"; });
+});
+
+trierJoueursAlphabetique();
+
+function save() { 
+    try { 
+        localStorage.setItem("joueurs_v5", JSON.stringify(joueurs)); 
+        localStorage.setItem("seances_v5", JSON.stringify(seancesDates)); 
+        localStorage.setItem("matchs_v5", JSON.stringify(matchsDates)); 
+    } catch(e) {}
+}
+
+document.querySelectorAll(".nav-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        let targetId = button.getAttribute("data-target");
+        document.querySelectorAll(".tab").forEach(t => t.classList.add("hidden"));
+        document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+        let targetTab = document.getElementById(targetId);
+        if(targetTab) targetTab.classList.remove("hidden");
+        button.classList.add("active");
+        refreshAll();
+    });
+});
+
+document.getElementById("btnSubmitLogin").onclick = () => {
+    if (document.getElementById("adminPassword").value === SECRET_PASSWORD) {
+        IsLoggedIn = true;
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("logoutForm").classList.remove("hidden");
+        document.getElementById("btnNavAuth").innerText = "🔓 Connecté";
+        document.getElementById("btnNavAuth").classList.add("logged");
+        document.querySelector('[data-target="dashboard"]').click();
+    } else { alert("❌ Mot de passe incorrect."); }
+};
+
+document.getElementById("btnSubmitLogout").onclick = () => {
+    IsLoggedIn = false;
+    document.getElementById("loginForm").classList.remove("hidden");
+    document.getElementById("logoutForm").classList.add("hidden");
+    document.getElementById("btnNavAuth").innerText = "🔒 Modifications";
+    document.getElementById("btnNavAuth").classList.remove("logged");
+    document.querySelector('[data-target="dashboard"]').click();
+};
+
+document.getElementById("checkboxAfficherPasses").onchange = function() { refreshAll(); };
+document.getElementById("checkboxAfficherMatchsPasses").onchange = function() { refreshAll(); };
+
+function refreshAll() {
+    let searchTerm = document.getElementById("searchJoueur") ? document.getElementById("searchJoueur").value.toLowerCase() : "";
+    let filterPoste = document.getElementById("filterPoste") ? document.getElementById("filterPoste").value : "Tous";
+
+    trierJoueursAlphabetique();
+
+    // Effectif
+    let body = document.getElementById("effectifBody");
+    if(body) {
+        body.innerHTML = "";
+        joueurs.forEach((j) => {
+            if(!(j.nom.toLowerCase().includes(searchTerm) || j.prenom.toLowerCase().includes(searchTerm))) return;
+            if(filterPoste !== "Tous" && j.poste !== filterPoste) return;
+            let row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="text-align:center; font-weight:bold;">${j.numero || "-"}</td>
+                <td><b>${j.nom.toUpperCase()}</b></td>
+                <td>${j.prenom}</td>
+                <td><span class="badge poste">${j.poste}</span></td>
+                <td style="text-align:center;">
+                    <button class="action" onclick="ouvrirFiche('${j.id}')">📄</button>
+                    <button class="delete" onclick="deleteJ('${j.id}')">🗑️</button>
+                </td>
+            `;
+            body.appendChild(row);
+        });
+    }
+
+    // Gestion des dates pour filtrer (Aujourd'hui)
+    const todayStr = new Date().toISOString().split('T')[0];
+    
+    // Filtrage Entraînements
+    const afficherSeancesTout = document.getElementById("checkboxAfficherPasses").checked;
+    let seancesAffichees = afficherSeancesTout ? seancesDates : seancesDates.filter(date => date >= todayStr);
+
+    // Filtrage Matchs
+    const afficherMatchsTout = document.getElementById("checkboxAfficherMatchsPasses").checked;
+    let matchsAffiches = afficherMatchsTout ? matchsDates : matchsDates.filter(m => m.date >= todayStr);
+
+    // Tableaux Entraînements
+    const configEntrainements = [
+        { headId: "dashboardHeadEntrainements", bodyId: "dashboardBodyEntrainements", dates: seancesAffichees, deleteBtn: false },
+        { headId: "headEntrainements", bodyId: "bodyEntrainements", dates: seancesAffichees, deleteBtn: true }
+    ];
+
+    configEntrainements.forEach(({ headId, bodyId, dates, deleteBtn }) => {
+        let head = document.getElementById(headId);
+        if(head) {
+            head.innerHTML = "<th>Nom</th>";
+            dates.forEach((date) => {
+                head.innerHTML += `
+                    <th style="text-align:center;">
+                        <div class="th-date-container">
+                            <span>${formatShortDate(date)}</span>
+                            ${deleteBtn ? `<button class="btn-del-seance" onclick="supprimerSeance('${date}')">❌</button>` : ''}
+                        </div>
+                    </th>`;
+            });
+        }
+        let bodyE = document.getElementById(bodyId);
+        if(bodyE) {
+            bodyE.innerHTML = "";
+            joueurs.forEach((j) => {
+                let row = document.createElement("tr");
+                row.innerHTML = `<td><b>${j.nom.toUpperCase()}</b> ${j.prenom.substring(0,1)}.</td>`;
+                dates.forEach((date) => {
+                    let val = j.presencesDates[date] || "P";
+                    row.innerHTML += `
+                        <td style="text-align:center; padding:4px 2px;">
+                            <select class="presence-select" data-val="${val}" onchange="changerPresenceE('${j.id}', '${date}', this.value)">
+                                <option value="P" ${val=="P"?"selected":""}>P</option>
+                                <option value="A" ${val=="A"?"selected":""}>A</option>
+                                <option value="B" ${val=="B"?"selected":""}>B</option>
+                                <option value="E" ${val=="E"?"selected":""}>E</option>
+                            </select>
+                        </td>`;
+                });
+                bodyE.appendChild(row);
+            });
+        }
+    });
+
+    // Tableaux Matchs
+    const tablesMatchs = [
+        { headId: "dashboardHeadMatchs", bodyId: "dashboardBodyMatchs", deleteBtn: false },
+        { headId: "headMatchs", bodyId: "bodyMatchs", deleteBtn: true }
+    ];
+    tablesMatchs.forEach(({ headId, bodyId, deleteBtn }) => {
+        let headM = document.getElementById(headId);
+        if(headM) {
+            headM.innerHTML = "<th>Nom du Joueur</th>";
+            matchsAffiches.forEach((m) => {
+                headM.innerHTML += `
+                    <th style="text-align:center; min-width:85px;">
+                        <div class="th-date-container">
+                            <span style="font-weight:bold;">${formatShortDate(m.date)}</span>
+                            <span class="th-lieu" title="${m.lieu || ''}">📍 ${m.lieu || 'Non spécifié'}</span>
+                            ${deleteBtn ? `<button class="btn-del-seance" onclick="supprimerMatch('${m.date}')">❌</button>` : ''}
+                        </div>
+                    </th>`;
+            });
+        }
+        let bodyM = document.getElementById(bodyId);
+        if(bodyM) {
+            bodyM.innerHTML = "";
+            joueurs.forEach((j) => {
+                let row = document.createElement("tr");
+                row.innerHTML = `<td><b>${j.nom.toUpperCase()}</b> ${j.prenom}</td>`;
+                matchsAffiches.forEach((m) => {
+                    let val = j.presencesMatchs[m.date] || "P";
+                    row.innerHTML += `
+                        <td style="text-align:center; padding:4px 2px;">
+                            <select class="presence-select" data-val="${val}" onchange="changerPresenceM('${j.id}', '${m.date}', this.value)">
+                                <option value="P" ${val=="P"?"selected":""}>P</option>
+                                <option value="A" ${val=="A"?"selected":""}>A</option>
+                                <option value="B" ${val=="B"?"selected":""}>B</option>
+                                <option value="E" ${val=="E"?"selected":""}>E</option>
+                                <option value="NC" ${val=="NC"?"selected":""}>NC</option>
+                            </select>
+                        </td>`;
+                });
+                bodyM.appendChild(row);
+            });
+        }
+    });
+
+    // Profils
+    let cont = document.getElementById("profilsContainer");
+    if(cont) {
+        cont.innerHTML = "";
+        joueurs.forEach(j => {
+            let ep=0, ea=0, eb=0, ee=0;
+            seancesDates.forEach(d => {
+                let v = j.presencesDates[d] || "P";
+                if(v==="P")ep++; else if(v==="A")ea++; else if(v==="B")eb++; else if(v==="E")ee++;
+            });
+            let mp=0, ma=0, mb=0, me=0, mnc=0;
+            matchsDates.forEach(m => {
+                let v = j.presencesMatchs[m.date] || "P";
+                if(v==="P")mp++; else if(v==="A")ma++; else if(v==="B")mb++; else if(v==="E")me++; else if(v==="NC")mnc++;
+            });
+
+            cont.innerHTML += `
+                <div class="profil-card">
+                    <div class="profil-title">N° ${j.numero || "?"} - ${j.nom.toUpperCase()} ${j.prenom}</div>
+                    <span class="badge poste">${j.poste}</span>
+                    
+                    <div class="profil-section-title">📅 Entraînements</div>
+                    <div class="mini-stats-wrapper">
+                        <div class="mini-stat-item stat-P">P <span>${ep}</span></div>
+                        <div class="mini-stat-item stat-A">A <span>${ea}</span></div>
+                        <div class="mini-stat-item stat-B">B <span>${eb}</span></div>
+                        <div class="mini-stat-item stat-E">E <span>${ee}</span></div>
+                    </div>
+
+                    <div class="profil-section-title">🏆 Matchs</div>
+                    <div class="mini-stats-wrapper">
+                        <div class="mini-stat-item stat-P">P <span>${mp}</span></div>
+                        <div class="mini-stat-item stat-A">A <span>${ma}</span></div>
+                        <div class="mini-stat-item stat-B">B <span>${mb}</span></div>
+                        <div class="mini-stat-item stat-E">E <span>${me}</span></div>
+                        <div class="mini-stat-item stat-NC">NC <span>${mnc}</span></div>
+                    </div>
+                </div>`;
+        });
+    }
+}
+
+function changerPresenceE(jId, date, val) {
+    if(!checkAuth()) { refreshAll(); return; }
+    let p = joueurs.find(x => x.id === jId);
+    if(p) { p.presencesDates[date] = val; save(); refreshAll(); }
+}
+
+function changerPresenceM(jId, date, val) {
+    if(!checkAuth()) { refreshAll(); return; }
+    let p = joueurs.find(x => x.id === jId);
+    if(p) { p.presencesMatchs[date] = val; save(); refreshAll(); }
+}
+
+document.getElementById("btnAjouterSeance").onclick = () => {
+    if(!checkAuth()) return;
+    let d = document.getElementById("nouvelleDateSeance").value;
+    if(!d || seancesDates.includes(d)) return;
+    seancesDates.push(d);
+    seancesDates.sort();
+    joueurs.forEach(j => j.presencesDates[d] = "P");
+    save(); refreshAll();
+};
+
+document.getElementById("btnAjouterMatch").onclick = () => {
+    if(!checkAuth()) return;
+    let d = document.getElementById("nouvelleDateMatch").value;
+    let lieu = document.getElementById("nouveauLieuMatch").value.trim() || "Non spécifié";
+    if(!d) { alert("⚠️ Sélectionner une date."); return; }
+    if(matchsDates.some(m => m.date === d)) { alert("⚠️ Match déjà planifié."); return; }
+    
+    matchsDates.push({ date: d, lieu: lieu });
+    matchsDates.sort((a,b) => a.date.localeCompare(b.date));
+    joueurs.forEach(j => j.presencesMatchs[d] = "P");
+    
+    document.getElementById("nouveauLieuMatch").value = "";
+    save(); refreshAll();
+};
+
+function supprimerSeance(d) {
+    if(!checkAuth()) return;
+    seancesDates = seancesDates.filter(x => x !== d);
+    joueurs.forEach(j => delete j.presencesDates[d]);
+    save(); refreshAll();
+}
+
+function supprimerMatch(d) {
+    if(!checkAuth()) return;
+    matchsDates = matchsDates.filter(x => x.date !== d);
+    joueurs.forEach(j => delete j.presencesMatchs[d]);
+    save(); refreshAll();
+}
+
+document.getElementById("btnAjouterJoueur").onclick = () => {
+    if(!checkAuth()) return;
+    let n = document.getElementById("nom").value.trim();
+    let p = document.getElementById("prenom").value.trim();
+    if(!n || !p) return;
+    let newJ = {
+        id: generateId(), numero: document.getElementById("numero").value,
+        nom: n, prenom: p, poste: document.getElementById("poste").value,
+        notes: "", presencesDates: {}, presencesMatchs: {}
+    };
+    seancesDates.forEach(d => newJ.presencesDates[d] = "P");
+    matchsDates.forEach(m => newJ.presencesMatchs[m.date] = "P");
+    joueurs.push(newJ);
+    document.getElementById("nom").value = ""; document.getElementById("prenom").value = "";
+    save(); refreshAll();
+};
+
+function abrirFiche(id) { ouvrirFiche(id); }
+
+function ouvrirFiche(id) {
+    let j = joueurs.find(x => x.id === id);
+    if(!j) return;
+    document.getElementById("ficheId").value = j.id;
+    document.getElementById("ficheNumero").value = j.numero || "";
+    document.getElementById("fichePoste").value = j.poste;
+    document.getElementById("ficheNom").value = j.nom;
+    document.getElementById("fichePrenom").value = j.prenom;
+    document.getElementById("ficheNotes").value = j.notes || "";
+    document.getElementById("btnNavFiche").click();
+}
+
+document.getElementById("btnEnregistrerFiche").onclick = () => {
+    if(!checkAuth()) return;
+    let j = joueurs.find(x => x.id === document.getElementById("ficheId").value);
+    if(j) {
+        j.numero = document.getElementById("ficheNumero").value;
+        j.poste = document.getElementById("fichePoste").value;
+        j.nom = document.getElementById("ficheNom").value.trim();
+        j.prenom = document.getElementById("fichePrenom").value.trim();
+        j.notes = document.getElementById("ficheNotes").value;
+        save(); refreshAll();
+        document.querySelector('[data-target="effectif"]').click();
+    }
+};
+
+document.getElementById("btnAnnulerFiche").onclick = () => {
+    document.querySelector('[data-target="effectif"]').click();
+};
+
+function deleteJ(id) {
+    if(!checkAuth()) return;
+    joueurs = joueurs.filter(x => x.id !== id);
+    save(); refreshAll();
+}
+
+document.getElementById("searchJoueur").oninput = refreshAll;
+document.getElementById("filterPoste").onchange = refreshAll;
+document.getElementById("btnTrierNom").onclick = () => { triNomAsc = !triNomAsc; refreshAll(); };
+
+document.getElementById("btnExport").onclick = () => {
+    let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({joueurs, seancesDates, matchsDates}));
+    let dl = document.createElement('a');
+    dl.setAttribute("href", dataStr);
+    dl.setAttribute("download", `FC_Erde_Sauvegarde.json`);
+    dl.click();
+};
+
+refreshAll();
+</script>
+</body>
+</html>
