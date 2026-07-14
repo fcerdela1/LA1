@@ -32,11 +32,6 @@ header p { font-size: 1rem; opacity: 0.9; }
 .nav-btn { padding: 10px 16px; border: 0; border-radius: 8px; cursor: pointer; background: #f1f5f9; color: var(--text-light); font-weight: 600; transition: all 0.2s ease; font-size: 14px; }
 .nav-btn:hover { background: #e2e8f0; color: var(--text); }
 .nav-btn.active { background: var(--primary); color: white; }
-.nav-btn.auth-status { margin-left: auto; background: #fee2e2; color: var(--danger); }
-.nav-btn.auth-status.logged { background: #dcfce7; color: #16a34a; }
-
-.hidden-nav { display: none !important; }
-.hidden { display: none !important; }
 
 .tab { padding: 20px; max-width: 1200px; margin: 0 auto; }
 .tab.hidden { display: none; }
@@ -47,10 +42,9 @@ header p { font-size: 1rem; opacity: 0.9; }
 .card { background: var(--card-bg); padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); }
 .card h2 { font-size: 1.15rem; color: var(--primary); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
 
-.form-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.form-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 15px; }
 input, select, textarea { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; color: var(--text); background: #fff; outline: none; transition: border-color 0.2s; }
 input:focus, select:focus, textarea:focus { border-color: var(--secondary); }
-textarea { width: 100%; resize: vertical; }
 
 button { padding: 10px 16px; border: 0; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; transition: opacity 0.2s; }
 button:hover { opacity: 0.9; }
@@ -78,7 +72,6 @@ select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
 .badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: bold; border-radius: 12px; background: #e2e2e2; color: var(--text); margin-right: 4px; margin-bottom: 4px;}
 .badge.poste { background: #dbeafe; color: var(--primary); }
 
-.profil-section-title { font-size: 12px; font-weight: bold; color: var(--primary); margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
 .mini-stats-wrapper { display: flex; gap: 5px; background: #fff; padding: 6px; border-radius: 6px; border: 1px solid var(--border); justify-content: space-around; margin-bottom: 8px; }
 .mini-stat-item { text-align: center; font-size: 11px; font-weight: bold; }
 .mini-stat-item span { display: block; font-size: 13px; margin-top: 1px; }
@@ -86,220 +79,120 @@ select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
 .stat-A { color: #dc2626; }
 .stat-B { color: #d97706; }
 .stat-E { color: #2563eb; }
-.stat-NC { color: #475569; }
 
-.search-box { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-.th-date-container { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; }
-.th-lieu { font-size: 10px; color: var(--text-light); font-weight: normal; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.btn-del-seance { background: none; border: none; color: var(--danger); cursor: pointer; padding: 0; font-size: 11px; }
-
-.toggle-container { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer; user-select: none; }
-.toggle-container input { cursor: pointer; width: 16px; height: 16px; }
+.stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+.stat-box { background: #f1f5f9; padding: 15px; border-radius: 8px; text-align: center; font-weight: bold; }
+.stat-box div { font-size: 24px; color: var(--secondary); margin-top: 5px; }
 </style>
 </head>
 <body>
 
 <header>
     <div class="header-container">
-        <img src="chemin/vers/votre-logo.png" alt="Logo Club" class="club-logo" onerror="this.style.display='none';">
         <div class="header-text">
             <h1>⚽ FC-Erde LA 1 - Saison 2026 / 2027</h1>
+            <p>Plateforme de Suivi et de Gestion de l'Équipe</p>
         </div>
     </div>
 </header>
 
 <div class="navbar">
     <button class="nav-btn active" data-target="dashboard">🏠 Dashboard</button>
-    <button class="nav-btn" data-target="effectif">👥 Effectif</button>
-    <button class="nav-btn" data-target="entrainements">📅 Entraînements</button>
-    <button class="nav-btn" data-target="matchs">🏆 Matchs</button>
-    <button class="nav-btn" data-target="profils">👤 Profils</button>
-    <button class="nav-btn" id="btnNavAdmin" data-target="admin">⚙️ Administration</button>
+    <button class="nav-btn" data-target="effectif">👥 Effectif & Présences</button>
+    <button class="nav-btn" data-target="sessions">📅 Séances & Matchs</button>
+    <button class="nav-btn" data-target="profils">👤 Profils Joueurs</button>
+    <button class="nav-btn" data-target="admin">⚙️ Administration</button>
 </div>
-<!-- CONTENU DES ONGLETS -->
+
 <main>
     <!-- 1. DASHBOARD -->
     <div id="dashboard" class="tab">
         <div class="card">
-            <h2>📈 Vue d'ensemble</h2>
-            <p>Bienvenue sur l'application de gestion du FC-Erde LA 1.</p>
+            <h2>📈 Vue d'ensemble du Club</h2>
+            <p>Bienvenue sur l'application de gestion. Voici un résumé global de l'équipe :</p>
+            <div class="stats-container">
+                <div class="stat-box">Joueurs inscrits<div id="dash-total-joueurs">0</div></div>
+                <div class="stat-box">Séances planifiées<div id="dash-total-sessions">0</div></div>
+                <div class="stat-box">Taux de présence moyen<div id="dash-pres-moyenne">0%</div></div>
+            </div>
         </div>
     </div>
 
-    <!-- 2. EFFECTIF -->
+    <!-- 2. EFFECTIF & PRÉSENCES -->
     <div id="effectif" class="tab hidden">
         <div class="card">
-            <h2>👥 Liste des Joueurs</h2>
+            <h2>👥 Tableau Global des Présences</h2>
             <div class="table-wrapper">
-                <table>
+                <table id="table-presences">
                     <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Prénom</th>
+                        <tr id="header-row">
+                            <th>Nom du Joueur</th>
                             <th>Poste</th>
-                            <th>Statut</th>
                         </tr>
                     </thead>
-                    <tbody id="effectif-table-body">
-                        <!-- Rempli par JS -->
-                    </tbody>
+                    <tbody id="body-presences"></tbody>
                 </table>
             </div>
+            <p style="font-size: 12px; color: var(--text-light);">Légende : P = Présent | A = Absent | B = Blessé | E = École/Travail | NC = Non Convoqué</p>
         </div>
     </div>
 
-    <!-- 3. ENTRAÎNEMENTS -->
-    <div id="entrainements" class="tab hidden">
+    <!-- 3. SÉANCES & MATCHS -->
+    <div id="sessions" class="tab hidden">
         <div class="card">
-            <h2>📅 Présences Entraînements</h2>
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Joueur</th>
-                            <th>Dernière séance</th>
-                            <th>Statut</th>
-                        </tr>
-                    </thead>
-                    <tbody id="entrainements-table-body">
-                        <!-- Rempli par JS -->
-                    </tbody>
-                </table>
+            <h2>📅 Ajouter un Événement (Entraînement ou Match)</h2>
+            <div class="form-group">
+                <input type="date" id="event-date">
+                <select id="event-type">
+                    <option value="Entraînement">⚽ Entraînement</option>
+                    <option value="Match">🏆 Match</option>
+                </select>
+                <input type="text" id="event-lieu" placeholder="Lieu (ex: Terrain Principal)">
+                <button class="save" onclick="ajouterEvenement()">Créer l'événement</button>
             </div>
         </div>
-    </div>
 
-    <!-- 4. MATCHS -->
-    <div id="matchs" class="tab hidden">
         <div class="card">
-            <h2>🏆 Calendrier & Résultats</h2>
+            <h2>📋 Liste des événements enregistrés</h2>
             <div class="table-wrapper">
                 <table>
                     <thead>
                         <tr>
                             <th>Date</th>
-                            <th>Adversaire</th>
+                            <th>Type</th>
                             <th>Lieu</th>
-                            <th>Résultat</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="matchs-table-body">
-                        <!-- Rempli par JS -->
-                    </tbody>
+                    <tbody id="liste-evenements"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- 5. PROFILS -->
+    <!-- 4. PROFILS -->
     <div id="profils" class="tab hidden">
         <div class="card">
-            <h2>👤 Profils des Joueurs</h2>
-            <div class="profil-grid" id="profils-container">
-                <!-- Rempli par JS -->
-            </div>
+            <h2>👤 Fiches Individuelles & Statistiques</h2>
+            <div class="profil-grid" id="grid-profils"></div>
         </div>
     </div>
 
-    <!-- 6. ADMINISTRATION -->
+    <!-- 5. ADMINISTRATION -->
     <div id="admin" class="tab hidden">
         <div class="card">
+            <h2>➕ Ajouter un nouveau joueur dans l'effectif</h2>
+            <div class="form-group">
+                <input type="text" id="j-nom" placeholder="Nom Prénom">
+                <select id="j-poste">
+                    <option value="Gardien">🧤 Gardien</option>
+                    <option value="Défenseur">🛡️ Défenseur</option>
+                    <option value="Milieu">⚙️ Milieu</option>
+                    <option value="Attaquant">🎯 Attaquant</option>
+                </select>
+                <button class="save" onclick="ajouterJoueur()">Ajouter le joueur</button>
+            </div>
+        </div>
 
-⚙️ Zone Administrateur
-
--- Choisir une action --
-Ajouter un joueur
-Ajouter un match
-
-Valider
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-// ---- DONNÉES DE SIMULATION DIRECTES ----
-const joueurs = [
-{ id: 1, nom: "Dupont", prenom: "Jean", poste: "Gardien", statut: "Actif" },
-{ id: 2, nom: "Martin", prenom: "Loïc", poste: "Défenseur", statut: "Actif" },
-{ id: 3, nom: "Bernard", prenom: "Lucas", poste: "Milieu", statut: "Actif" },
-{ id: 4, nom: "Petit", prenom: "Thomas", poste: "Attaquant", statut: "Blessé" }
-];
-const matchs = [
-{ date: "2026-09-05", adversaire: "FC Sion II", lieu: "Domicile", score: "2 - 1" },
-{ date: "2026-09-12", adversaire: "FC Martigny", lieu: "Extérieur", score: "0 - 0" }
-];
-// ---- LOGIQUE DE NAVIGATION ----
-const navButtons = document.querySelectorAll('.nav-btn');
-const tabs = document.querySelectorAll('.tab');
-navButtons.forEach(btn => {
-btn.addEventListener('click', () => {
-const target = btn.getAttribute('data-target');
-// Mise à jour de l'état des boutons
-navButtons.forEach(b => b.classList.remove('active'));
-btn.classList.add('active');
-// Masquage de tous les onglets, affichage de l'onglet actif
-tabs.forEach(tab => {
-if (tab.id === target) {
-tab.classList.remove('hidden');
-} else {
-tab.classList.add('hidden');
-}
-});
-});
-});
-// ---- CHARGEMENT DE L'EFFECTIF ----
-const effectifTable = document.getElementById('effectif-table-body');
-if (effectifTable) {
-joueurs.forEach(j => {
-const tr = document.createElement('tr');
-tr.innerHTML = <td><b>${j.nom}</b></td><td>${j.prenom}</td><td>${j.poste}</td><td>${j.statut}</td>;
-effectifTable.appendChild(tr);
-});
-}
-// ---- CHARGEMENT DES ENTRAÎNEMENTS ----
-const entrainementsTable = document.getElementById('entrainements-table-body');
-if (entrainementsTable) {
-joueurs.forEach(j => {
-const tr = document.createElement('tr');
-tr.innerHTML = <td>${j.prenom} ${j.nom}</td> <td>Dernière session</td> <td> <select class="presence-select" data-val="P" onchange="this.setAttribute('data-val', this.value)"> <option value="P" selected>Présent</option> <option value="A">Absent</option> <option value="B">Blessé</option> <option value="E">Excusé</option> </select> </td>;
-entrainementsTable.appendChild(tr);
-});
-}
-// ---- CHARGEMENT DES MATCHS ----
-const matchsTable = document.getElementById('matchs-table-body');
-if (matchsTable) {
-matchs.forEach(m => {
-const tr = document.createElement('tr');
-tr.innerHTML = <td>${m.date}</td><td>${m.adversaire}</td><td>${m.lieu}</td><td><b>${m.score}</b></td>;
-matchsTable.appendChild(tr);
-});
-}
-// ---- CHARGEMENT DES PROFILS ----
-const profilsContainer = document.getElementById('profils-container');
-if (profilsContainer) {
-joueurs.forEach(j => {
-const div = document.createElement('div');
-div.className = 'profil-card';
-div.innerHTML = <div class="profil-title">${j.prenom} ${j.nom}</div> <span class="badge poste">${j.poste}</span> <span class="badge">${j.statut}</span> <div class="profil-section-title">Statistiques</div> <div class="mini-stats-wrapper"> <div class="mini-stat-item stat-P">P<span>12</span></div> <div class="mini-stat-item stat-A">A<span>1</span></div> <div class="mini-stat-item stat-E">E<span>2</span></div> </div>;
-profilsContainer.appendChild(div);
-});
-}
-// ---- GESTION DU MENU DÉROULANT ADMIN ----
-const btnAdminAction = document.getElementById('btn-admin-action');
-const adminSelect = document.getElementById('admin-select');
-if (btnAdminAction && adminSelect) {
-btnAdminAction.addEventListener('click', () => {
-const action = adminSelect.value;
-if (action === 'none') {
-alert('Veuillez sélectionner une action valide.');
-} else if (action === 'add-player') {
-alert('Fonctionnalité : Redirection vers le formulaire d'ajout de joueur.');
-} else if (action === 'add-match') {
-alert('Fonctionnalité : Redirection vers le formulaire d'ajout de match.');
-}
-});
-}
-});
-
-
-
+        <div class="card">
+            <h2>💾 Sauvegarde et Transfert de Données</h2>
