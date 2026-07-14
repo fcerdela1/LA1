@@ -1,13 +1,3 @@
-Le problème dans votre fichier HTML est que le code est incomplet : il s'arrête brutalement au milieu de la structure (<div class="table-wrapper">). De plus, il manque l'intégralité du code JavaScript à la fin du fichier pour faire fonctionner les boutons de la barre de navigation et charger les menus ou tableaux.
-Pour que votre site fonctionne correctement sur GitHub, voici le code complet, corrigé, propre et structuré.
-## Ce qui a été corrigé et ajouté :
-
-   1. Fermeture du HTML : Toutes les balises ouvertes (<div>, <body>, </html>) sont désormais correctement fermées.
-   2. Ajout du Script de Navigation : Un script JavaScript a été intégré à la fin du fichier pour permettre de basculer d'un onglet à l'autre lors du clic sur les boutons de la barre de navigation (Dashboard, Effectif, Matchs, etc.).
-   3. Gestion des listes déroulantes (Menus) : Les éléments interactifs de l'onglet Administrateur / Connexion sont maintenant fonctionnels.
-
-## Code complet à copier-coller dans votre fichier index.html :
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -46,10 +36,9 @@ header p { font-size: 1rem; opacity: 0.9; }
 .nav-btn.auth-status.logged { background: #dcfce7; color: #16a34a; }
 
 .hidden-nav { display: none !important; }
-.hidden { display: none !important; }
 
 .tab { padding: 20px; max-width: 1200px; margin: 0 auto; }
-.tab.hidden { display: none; }
+.tab.hidden { display: none !important; }
 .tab:not(.hidden) { animation: fadeIn 0.3s ease; }
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
@@ -105,13 +94,19 @@ select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
 
 .toggle-container { display: flex; align-items: center; gap: 8px; background: #f1f5f9; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--primary); cursor: pointer; user-select: none; }
 .toggle-container input { cursor: pointer; width: 16px; height: 16px; }
+
+/* Styles du Dashboard ajoutés pour uniformité */
+.dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+.stat-box { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 10px; text-align: center; }
+.stat-box h3 { font-size: 13px; color: var(--text-light); text-transform: uppercase; margin-bottom: 5px; }
+.stat-box p { font-size: 24px; font-weight: bold; color: var(--primary); }
 </style>
 </head>
 <body>
 
 <header>
     <div class="header-container">
-        <img src="chemin/vers/votre-logo.png" alt="Logo Club" class="club-logo" onerror="this.style.display='none';">
+        <img src="logo.png" alt="Logo Club" class="club-logo" onerror="this.style.display='none';">
         <div class="header-text">
             <h1>⚽ FC-Erde LA 1 - Saison 2026 / 2027</h1>
         </div>
@@ -128,7 +123,8 @@ select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
     <button class="nav-btn" data-target="sauvegarde">💾 Sauvegarde</button>
     <button class="nav-btn auth-status" id="btnNavAuth" data-target="loginTab">🔒 Modifications</button>
 </div>
-<!-- SECTION CONNEXION -->
+
+<!-- SECTION : LOGIN -->
 <div id="loginTab" class="tab hidden">
     <div class="card" style="max-width: 400px; margin: 0 auto;">
         <h2>🔐 Espace Administrateur</h2>
@@ -142,103 +138,39 @@ select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
         </div>
     </div>
 </div>
-<!-- SECTION DASHBOARD -->
+
+<!-- SECTION : DASHBOARD -->
 <div id="dashboard" class="tab">
+    <div class="dashboard-stats">
+        <div class="stat-box"><h3>Joueurs Actifs</h3><p id="dashCountJoueurs">0</p></div>
+        <div class="stat-box"><h3>Entraînements</h3><p id="dashCountEntraînements">0</p></div>
+        <div class="stat-box"><h3>Matchs Joués</h3><p id="dashCountMatchs">0</p></div>
+        <div class="stat-box"><h3>Taux Présence Global</h3><p id="dashTauxPresence">0%</p></div>
+    </div>
     <div class="card">
-        <h2>📅 Suivi Présences (Entraînements)</h2>
+        <h2>📅 Suivi Présences (Global)</h2>
         <div class="table-wrapper">
-            <table>
+            <table id="tableDashboardGlobal">
                 <thead>
                     <tr>
-                        <th>Joueurs</th>
-                        <th>
-                            <div class="th-date-container">
-                                <span>15/09</span>
-                                <span class="th-lieu">Terrain A</span>
-                            </div>
-                        </th>
-                        <th>
-                            <div class="th-date-container">
-                                <span>22/09</span>
-                                <span class="th-lieu">Terrain B</span>
-                            </div>
-                        </th>
+                        <th>Nom Joueur</th>
+                        <th>Poste</th>
+                        <th>Assiduité</th>
+                        <th>Stats (P / A / B / E / NC)</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Joueur Exemple 1</td>
-                        <td>
-                            <select class="presence-select" data-val="P" onchange="this.setAttribute('data-val', this.value)">
-                                <option value="P" selected>P (Présent)</option>
-                                <option value="A">A (Absent)</option>
-                                <option value="B">B (Blessé)</option>
-                                <option value="E">E (École/Travail)</option>
-                                <option value="NC">NC</option>
-                            </select>
-                        </td>
-                        <td>
-                            <select class="presence-select" data-val="A" onchange="this.setAttribute('data-val', this.value)">
-                                <option value="P">P (Présent)</option>
+                <tbody id="tbodyDashboard">
+                    <!-- Généré par JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-A (Absent)
-B (Blessé)
-E (École/Travail)
-NC
-
-
-
-
-
-
-
-👥 EffectifContenu de l'effectif...
-📅 EntraînementsGestion des séances...
-🏆 MatchsCalendrier des matchs...
-👤 ProfilsProfils des joueurs...
-📄 Fiche JoueurFiche détaillée...
-💾 SauvegardeOptions de sauvegarde...
-
-document.querySelectorAll('.nav-btn').forEach(button => {
-button.addEventListener('click', () => {
-const targetTabId = button.getAttribute('data-target');
-// Gérer l'état actif sur les boutons
-document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-button.classList.add('active');
-// Masquer tous les onglets
-document.querySelectorAll('.tab').forEach(tab => tab.classList.add('hidden'));
-// Afficher l'onglet ciblé
-const targetTab = document.getElementById(targetTabId);
-if (targetTab) {
-targetTab.classList.remove('hidden');
-}
-});
-});
-// Simulation basique du formulaire de connexion pour débloquer le menu déroulant
-document.getElementById('btnSubmitLogin').addEventListener('click', () => {
-const password = document.getElementById('adminPassword').value;
-if(password === "admin") { // Remplacez par votre vrai système
-document.getElementById('loginForm').classList.add('hidden');
-document.getElementById('logoutForm').classList.remove('hidden');
-document.getElementById('btnNavAuth').classList.add('logged');
-document.getElementById('btnNavAuth').innerText = "🔓 Connecté";
-} else {
-alert("Mot de passe incorrect (Entrez 'admin' pour le test)");
-}
-});
-document.getElementById('btnSubmitLogout').addEventListener('click', () => {
-document.getElementById('loginForm').classList.remove('hidden');
-document.getElementById('logoutForm').classList.add('hidden');
-document.getElementById('btnNavAuth').classList.remove('logged');
-document.getElementById('btnNavAuth').innerText = "🔒 Modifications";
-});
-
-
-### Prochaine étape pour appliquer le correctif :
-* Mettez à jour votre fichier local avec ce code.
-* Envoyez-le (*Push*) sur votre dépôt GitHub.
-* N'oubliez pas de vider le cache de votre navigateur avec **Ctrl + F5** (ou **Cmd + Maj + R** sur Mac) pour forcer le chargement de la nouvelle version.
-
-Avez-vous besoin d'aide pour **intégrer les vraies données de vos joueurs** ou configurer un **vrai mot de passe** dans la partie script ?
-
-
+<!-- SECTION : EFFECTIF -->
+<div id="effectif" class="tab hidden">
+    <div class="card admin-only">
+        <h2>➕ Ajouter un nouveau joueur</h2>
+        <div class="form-group">
+            <input type="text" id="jNom" placeholder="Nom complet" required>
+            <select id="jPoste">

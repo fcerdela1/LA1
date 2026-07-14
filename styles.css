@@ -1,0 +1,249 @@
+:root { 
+    --primary: #1e3a8a; 
+    --secondary: #2563eb; 
+    --bg: #f8fafc; 
+    --card-bg: #ffffff;
+    --text: #0f172a;
+    --text-light: #64748b;
+    --danger: #ef4444; 
+    --success: #22c55e; 
+    --warning: #f59e0b;
+    --info: #3b82f6;
+    --border: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    line-height: 1.5; 
+}
+
+/* ---- EN-TÊTE ---- */
+header { 
+    background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+    color: white; 
+    padding: 25px 20px; 
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+}
+
+.header-container { 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 20px; 
+}
+
+.club-logo { 
+    height: 70px; 
+    width: auto; 
+    object-fit: contain; 
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); 
+}
+
+.header-text { text-align: left; }
+header h1 { font-size: 2rem; margin-bottom: 5px; }
+
+/* ---- NAVIGATION ---- */
+.navbar { 
+    display: flex; 
+    gap: 8px; 
+    padding: 12px; 
+    background: var(--card-bg); 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+    overflow-x: auto; 
+    white-space: nowrap; 
+}
+
+.nav-btn { 
+    padding: 10px 16px; 
+    border: 0; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    background: #f1f5f9; 
+    color: var(--text-light); 
+    font-weight: 600; 
+    transition: all 0.2s ease; 
+    font-size: 14px; 
+}
+
+.nav-btn:hover { background: #e2e8f0; color: var(--text); }
+.nav-btn.active { background: var(--primary); color: white; }
+.nav-btn.auth-status { margin-left: auto; background: #fee2e2; color: var(--danger); }
+.nav-btn.auth-status.logged { background: #dcfce7; color: #16a34a; }
+
+.hidden-nav { display: none !important; }
+
+/* ---- ONGLETS & SECTIONS ---- */
+.tab { padding: 20px; max-width: 1200px; margin: 0 auto; }
+.tab.hidden { display: none !important; }
+.tab:not(.hidden) { animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(5px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* ---- BLOCS CARTES ---- */
+.card { 
+    background: var(--card-bg); 
+    padding: 20px; 
+    margin-bottom: 20px; 
+    border-radius: 12px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    border: 1px solid var(--border); 
+}
+
+.card h2 { 
+    font-size: 1.15rem; 
+    color: var(--primary); 
+    margin-bottom: 15px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+
+/* ---- FORMULAIRES & INPUTS ---- */
+.form-group { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
+    align-items: center; 
+}
+
+input, select, textarea { 
+    padding: 10px 12px; 
+    border: 1px solid var(--border); 
+    border-radius: 8px; 
+    font-size: 14px; 
+    color: var(--text); 
+    background: #fff; 
+    outline: none; 
+    transition: border-color 0.2s; 
+}
+
+input:focus, select:focus, textarea:focus { border-color: var(--secondary); }
+textarea { width: 100%; resize: vertical; }
+
+/* ---- BOUTONS ---- */
+button { 
+    padding: 10px 16px; 
+    border: 0; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: 600; 
+    font-size: 14px; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 6px; 
+    transition: opacity 0.2s; 
+}
+
+button:hover { opacity: 0.9; }
+button.save { background: var(--success); color: white; }
+button.action { background: var(--secondary); color: white; }
+button.delete { background: var(--danger); color: white; }
+button.secondary { background: #64748b; color: white; }
+
+/* ---- TABLEAUX ET GRILLES DE POINTAGE ---- */
+.table-wrapper { 
+    overflow-x: auto; 
+    margin-top: 15px; 
+    border-radius: 8px; 
+    border: 1px solid var(--border); 
+    margin-bottom: 15px; 
+}
+
+table { width: 100%; border-collapse: collapse; background: white; text-align: left; }
+th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 14px; }
+th { background: #f1f5f9; color: var(--primary); font-weight: 600; white-space: nowrap; }
+tr:hover { background: #f8fafc; }
+
+/* ---- COULEURS DYNAMIQUES SÉLECTEURS DE PRÉSENCE ---- */
+select.presence-select { padding: 4px 8px; font-weight: bold; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer; }
+select.presence-select[data-val="P"] { background: #dcfce7; color: #16a34a; }
+select.presence-select[data-val="A"] { background: #fee2e2; color: #dc2626; }
+select.presence-select[data-val="B"] { background: #fef3c7; color: #d97706; }
+select.presence-select[data-val="E"] { background: #dbeafe; color: #2563eb; }
+select.presence-select[data-val="NC"] { background: #e2e8f0; color: #475569; }
+
+/* ---- EN-TÊTE DES COLONNES DATES ---- */
+.th-date-container { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; }
+.th-lieu { font-size: 10px; color: var(--text-light); font-weight: normal; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-del-seance { background: none; border: none; color: var(--danger); cursor: pointer; padding: 0; font-size: 11px; }
+
+/* ---- DASHBOARD GRANDE SYNTHÈSE ---- */
+.dashboard-stats { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 15px; 
+    margin-bottom: 20px; 
+}
+
+.stat-box { 
+    background: #f8fafc; 
+    border: 1px solid var(--border); 
+    padding: 15px; 
+    border-radius: 10px; 
+    text-align: center; 
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.stat-box h3 { font-size: 13px; color: var(--text-light); text-transform: uppercase; margin-bottom: 5px; }
+.stat-box p { font-size: 24px; font-weight: bold; color: var(--primary); }
+
+/* ---- INDIFICATEURS DE STATISTIQUES TEXTUELS ---- */
+.stat-P { color: #16a34a; font-weight: 600; }
+.stat-A { color: #dc2626; font-weight: 600; }
+.stat-B { color: #d97706; font-weight: 600; }
+.stat-E { color: #2563eb; font-weight: 600; }
+.stat-NC { color: #475569; font-weight: 600; }
+
+/* ---- GRILLE & CARTES DES PROFILS ---- */
+.search-box { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+
+.profil-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    gap: 15px; 
+}
+
+.profil-card { 
+    background: var(--card-bg); 
+    border: 1px solid var(--border); 
+    padding: 15px; 
+    border-radius: 12px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
+}
+
+.profil-title { color: var(--primary); font-weight: bold; font-size: 16px; border-bottom: 1px solid var(--border); padding-bottom: 5px; margin-bottom: 8px; }
+.profil-section-title { font-size: 12px; font-weight: bold; color: var(--primary); margin-top: 10px; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* ---- MINI COMPTEURS DANS LES CARTES ---- */
+.mini-stats-wrapper { 
+    display: flex; 
+    gap: 5px; 
+    background: #f8fafc; 
+    padding: 8px; 
+    border-radius: 8px; 
+    border: 1px solid var(--border); 
+    justify-content: space-around; 
+    margin-bottom: 8px; 
+}
+
+.mini-stat-item { text-align: center; font-size: 11px; font-weight: bold; }
+.mini-stat-item span { display: block; font-size: 14px; margin-top: 1px; color: var(--text); }
+
+/* ---- BADGES ET POSTES ---- */
+.badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: bold; border-radius: 12px; background: #e2e8f0; color: var(--text); }
+.badge.poste { background: #dbeafe; color: var(--primary); }
+
+/* ---- ACCÈS RESTREINT (ADMIN) ---- */
+.admin-only { display: none; }
